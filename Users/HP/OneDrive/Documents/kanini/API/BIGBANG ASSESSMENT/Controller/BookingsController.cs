@@ -31,7 +31,9 @@ namespace BIGBANG_ASSESSMENT.Controller
           {
               return NotFound();
           }
-            return await _context.Booking.ToListAsync();
+            return await _context.Booking
+                .Include(x => x.Customers)
+                .Include(x => x.hotels).ToListAsync();
         }
 
         // GET: api/Bookings/5

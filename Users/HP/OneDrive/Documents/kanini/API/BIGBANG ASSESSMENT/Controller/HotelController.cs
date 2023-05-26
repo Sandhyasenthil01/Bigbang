@@ -52,19 +52,20 @@ namespace BIGBANG_ASSESSMENT.Controller
         }
 
         [HttpPost]
-        public ActionResult<string> Post(Hotels hotel)
+        public ActionResult<Hotels> Post(Hotels hotel)
         {
-            
             try
             {
-                var hotel_ = er.PostHotels(hotel);
-                return Ok("Inserted");
+                return Ok(er.PostHotels(hotel));
             }
             catch (Exception ex)
             {
+
                 return BadRequest(ex.Message);
             }
         }
+
+
 
         [HttpPut("{id}")]
         public IActionResult Put(Hotels hotel)

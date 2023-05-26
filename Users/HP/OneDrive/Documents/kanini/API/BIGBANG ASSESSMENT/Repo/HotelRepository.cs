@@ -18,7 +18,7 @@ namespace BIGBANG_ASSESSMENT.Repo
         }
         public IEnumerable<Hotels> GetHotels()
         {
-            return HotelContext.Hotels.ToList();
+            return HotelContext.Hotels.Include(x => x.Rooms).ToList();
         }
         public Hotels PostHotels(Hotels Hotels)
         {

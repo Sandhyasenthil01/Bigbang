@@ -3858,6 +3858,9 @@
       "ClassLibrary3/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
+        "dependencies": {
+          "Microsoft.AspNetCore.Mvc.NewtonsoftJson": "6.0.16"
+        },
         "compile": {
           "bin/placeholder/ClassLibrary3.dll": {}
         },
