@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BIGBANG_ASSESSMENT.DB;
 using BIGBANG_ASSESSMENT.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BIGBANG_ASSESSMENT.Controller
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class StaffsController : ControllerBase

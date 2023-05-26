@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using BIGBANG_ASSESSMENT.Models;
+using BIGBANG_ASSESSMENT.Repo;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using BIGBANG_ASSESSMENT.DB;
-using BIGBANG_ASSESSMENT.Models;
 
 namespace BIGBANG_ASSESSMENT.Controller
 {
@@ -14,111 +10,94 @@ namespace BIGBANG_ASSESSMENT.Controller
     [ApiController]
     public class RoomsController : ControllerBase
     {
-        private readonly HotelContext _context;
+            private readonly IRoomRepository hr;
 
-        public RoomsController(HotelContext context)
-        {
-            _context = context;
-        }
-
-        // GET: api/Rooms
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Rooms>>> GetRooms()
-        {
-          if (_context.Rooms == null)
-          {
-              return NotFound();
-          }
-            return await _context.Rooms.ToListAsync();
-        }
-
-        // GET: api/Rooms/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Rooms>> GetRooms(int id)
-        {
-          if (_context.Rooms == null)
-          {
-              return NotFound();
-          }
-            var rooms = await _context.Rooms.FindAsync(id);
-
-            if (rooms == null)
+            public RoomsController(IRoomRepository hr)
             {
-                return NotFound();
+                this.hr = hr;
             }
 
-            return rooms;
-        }
-
-        // PUT: api/Rooms/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutRooms(int id, Rooms rooms)
-        {
-            if (id != rooms.RoomId)
+            [HttpGet]
+            public ActionResult<IEnumerable<Rooms>> GetRoom()
             {
-                return BadRequest();
-            }
-
-            _context.Entry(rooms).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!RoomsExists(id))
+                try
                 {
-                    return NotFound();
+                    return Ok(hr.GetRoom());
                 }
-                else
+                catch (Exception ex)
                 {
-                    throw;
+
+                    return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while retrieving hotels.");
                 }
             }
 
-            return NoContent();
-        }
-
-        // POST: api/Rooms
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Rooms>> PostRooms(Rooms rooms)
-        {
-          if (_context.Rooms == null)
-          {
-              return Problem("Entity set 'HotelContext.Rooms'  is null.");
-          }
-            _context.Rooms.Add(rooms);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetRooms", new { id = rooms.RoomId }, rooms);
-        }
-
-        // DELETE: api/Rooms/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRooms(int id)
-        {
-            if (_context.Rooms == null)
+            [HttpGet("{id}")]
+            public ActionResult<Rooms> GetRoomByid(int id)
             {
-                return NotFound();
-            }
-            var rooms = await _context.Rooms.FindAsync(id);
-            if (rooms == null)
-            {
-                return NotFound();
+                try
+                {
+                    var rooms = hr.GetRoomByid(id);
+                    if (rooms == null)
+                    {
+                        return NotFound();
+                    }
+                    return Ok(rooms);
+                }
+                catch (Exception ex)
+                {
+
+                    return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while retrieving the hotel.");
+                }
             }
 
-            _context.Rooms.Remove(rooms);
-            await _context.SaveChangesAsync();
+            [HttpPut("{id}")]
+            public IActionResult Put(int id, Rooms room)
+            {
+                try
+                {
+                    hr.PutRoom(room);
+                    return NoContent();
+                }
+                catch (Exception ex)
+                {
 
-            return NoContent();
-        }
+                    return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the hotel.");
+                }
+            }
 
-        private bool RoomsExists(int id)
-        {
-            return (_context.Rooms?.Any(e => e.RoomId == id)).GetValueOrDefault();
+            [HttpPost]
+            public ActionResult<Rooms> Post(Rooms room)
+            {
+                try
+                {
+                    return Ok(hr.PostRoom(room));
+                }
+                catch (Exception ex)
+                {
+
+                    return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while creating the hotel.");
+                }
+            }
+
+
+
+            [HttpDelete("{id}")]
+            public IActionResult DeleteRoom(int id)
+            {
+                try
+                {
+                    hr.DeleteRoom(id);
+                    return NoContent();
+                }
+                catch (Exception ex)
+                {
+
+                    return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while deleting the hotel.");
+                }
+            }
+
+
         }
     }
-}
+
+

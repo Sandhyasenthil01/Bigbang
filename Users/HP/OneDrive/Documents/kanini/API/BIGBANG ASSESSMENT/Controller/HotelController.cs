@@ -1,10 +1,12 @@
 ﻿using BIGBANG_ASSESSMENT.Models;
 using BIGBANG_ASSESSMENT.Repo;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BIGBANG_ASSESSMENT.Controller
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class HotelController : ControllerBase
@@ -19,63 +21,138 @@ namespace BIGBANG_ASSESSMENT.Controller
 
 
         [HttpGet]
-
-        public IEnumerable<Hotels> GetHotels()
+        public ActionResult<IEnumerable<Hotels>> GetHotel()
         {
-            return er.GetHotels();
+            try
+            {
+                return Ok(er.GetHotels());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while retrieving hotels.");
+            }
         }
 
         [HttpGet("{id}")]
-
-        public Hotels Getid(int id)
+        public ActionResult<Hotels> Getid(int id)
         {
-            return er.GetHotelById( id);
+            try
+            {
+                var hotel = er.GetHotelById(id);
+                if (hotel == null)
+                {
+                    return NotFound();
+                }
+                return Ok(hotel);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while retrieving the hotel.");
+            }
         }
+
         [HttpPost]
-
-        public Hotels Post(Hotels Hotels)
+        public ActionResult<string> Post(Hotels hotel)
         {
-            return er.PostHotels(Hotels);
+            
+            try
+            {
+                var hotel_ = er.PostHotels(hotel);
+                return Ok("Inserted");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+
         [HttpPut("{id}")]
-
-        public void PutHotel(Hotels Hotels)
+        public IActionResult Put(Hotels hotel)
         {
-            er.PutHotel(Hotels);
+            try
+            {
+                er.PutHotel(hotel);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the hotel.");
+            }
         }
+
 
         [HttpDelete("{id}")]
-
-        public void Delete(int id)
+        public IActionResult Delete(int id)
         {
-            er.DeleteHotels(id);
+            try
+            {
+                er.DeleteHotels(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while deleting the hotel.");
+            }
         }
+
         [HttpGet("/count")]
-
-        public int GetAvailableRoomCount(string hotelname)
+        public ActionResult<int> GetRoomAvailabilityCount(string hotelname)
         {
-            int availableSeats = er.GetAvailableRoomCount(hotelname);
-            return availableSeats;
+            try
+            {
+                int availablerooms = er.GetAvailableRoomCount(hotelname);
+                return Ok(availablerooms);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while retrieving the room availability count.");
+            }
         }
 
 
-       
 
         [HttpGet("/filter/location")]
-        public IEnumerable<Hotels> GetLocation(string location)
+        public ActionResult<IEnumerable<Hotels>> GetLocation(string location)
         {
-            return er.GetLocation(location);
+            try
+            {
+                return Ok(er.GetLocation(location));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while filtering by location.");
+            }
         }
+
+
         [HttpGet("/filter/amenities")]
-        public IEnumerable<Hotels> GetAmenities(string amenities)
+        public ActionResult<IEnumerable<Hotels>> GetAmenities(string amenities)
         {
-            return er.GetAmenities(amenities);
+            try
+            {
+                return Ok(er.GetAmenities(amenities));
+            }
+            catch (Exception ex)
+            {
+                
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while filtering by amenities.");
+            }
         }
+
+
         [HttpGet("/filter/price")]
-        public IEnumerable<Hotels> GetPrice(int price)
+        public ActionResult<IEnumerable<Hotels>> GetPrice(int price)
         {
-            return er.GetPrice(price);
+            try
+            {
+                return Ok(er.GetPrice(price));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while filtering by price.");
+            }
         }
+
     }
 }
 

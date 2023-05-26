@@ -32,7 +32,7 @@ namespace BIGBANG_ASSESSMENT.Controller
 
                 if (user != null)
                 {
-                    //create claims details based on the user information
+                    
                     var claims = new[] {
                         new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
