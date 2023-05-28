@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using BIGBANG_ASSESSMENT.DB;
 using BIGBANG_ASSESSMENT.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Text;
+using System.Security.Cryptography;
 
 namespace BIGBANG_ASSESSMENT.Controller
 {
@@ -23,26 +25,33 @@ namespace BIGBANG_ASSESSMENT.Controller
         {
             _context = context;
         }
-        [Authorize]
+        [Authorize(Roles = "Staff")]
         // GET: api/Customers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
         {
-          if (_context.Customers == null)
-          {
-              return NotFound();
-          }
-            return await _context.Customers.ToListAsync();
+            var customers = await _context.Customers.ToListAsync();
+            var customerDtos = customers.Select(c => new Customer
+            {
+                CustomerId = c.CustomerId,
+                CustomerName = c.CustomerName,
+                CustomerEmail = c.CustomerEmail,
+                CustomerPassword = HashPassword(c.CustomerPassword)
+            }).ToList();
+
+            return customerDtos;
         }
-        [Authorize]
+        [Authorize(Roles = "Staff")]
         // GET: api/Customers/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Customer>> GetCustomer(int id)
+
+[HttpGet("{id}")]
+        public async Task<ActionResult<Customer>> GetCustomerById(int id)
         {
-          if (_context.Customers == null)
-          {
-              return NotFound();
-          }
+            if (_context.Customers == null)
+            {
+                return NotFound();
+            }
+
             var customer = await _context.Customers.FindAsync(id);
 
             if (customer == null)
@@ -50,9 +59,17 @@ namespace BIGBANG_ASSESSMENT.Controller
                 return NotFound();
             }
 
-            return customer;
+            var getCustomer = new Customer
+            {
+                CustomerId = customer.CustomerId,
+                CustomerName = customer.CustomerName,
+                CustomerEmail = customer.CustomerEmail,
+                CustomerPassword = HashPassword(customer.CustomerPassword)
+            };
+
+            return getCustomer;
         }
-        [Authorize]
+        [Authorize(Roles = "Customer")]
         // PUT: api/Customers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -83,7 +100,6 @@ namespace BIGBANG_ASSESSMENT.Controller
 
             return NoContent();
         }
-
         // POST: api/Customers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
@@ -98,7 +114,7 @@ namespace BIGBANG_ASSESSMENT.Controller
 
             return CreatedAtAction("GetCustomer", new { id = customer.CustomerId }, customer);
         }
-        [Authorize]
+        [Authorize(Roles = "Staff")]    
         // DELETE: api/Customers/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCustomer(int id)
@@ -118,7 +134,15 @@ namespace BIGBANG_ASSESSMENT.Controller
 
             return NoContent();
         }
-
+        private string HashPassword(string password)
+        {
+          
+            using (var sha256 = SHA256.Create())
+            {
+                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                return Convert.ToBase64String(hashedBytes);
+            }
+        }
         private bool CustomerExists(int id)
         {
             return (_context.Customers?.Any(e => e.CustomerId == id)).GetValueOrDefault();

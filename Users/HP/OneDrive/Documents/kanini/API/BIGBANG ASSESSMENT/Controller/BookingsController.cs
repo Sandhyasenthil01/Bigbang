@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace BIGBANG_ASSESSMENT.Controller
 {
-    [Authorize]
+    [Authorize(Roles = "Customer,Staff")]
     [Route("api/[controller]")]
     [ApiController]
     public class BookingsController : ControllerBase

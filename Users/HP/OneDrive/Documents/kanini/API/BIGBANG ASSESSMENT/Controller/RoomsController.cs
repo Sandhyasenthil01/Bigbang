@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BIGBANG_ASSESSMENT.Controller
 {
+    [Authorize(Roles = "Staff")]
     [Route("api/[controller]")]
     [ApiController]
     public class RoomsController : ControllerBase
@@ -24,7 +25,7 @@ namespace BIGBANG_ASSESSMENT.Controller
                 {
                     return Ok(hr.GetRoom());
                 }
-                catch (Exception ex)
+                catch (Exception )
                 {
 
                     return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while retrieving hotels.");
@@ -43,7 +44,7 @@ namespace BIGBANG_ASSESSMENT.Controller
                     }
                     return Ok(rooms);
                 }
-                catch (Exception ex)
+                catch (Exception )
                 {
 
                     return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while retrieving the hotel.");
@@ -58,7 +59,7 @@ namespace BIGBANG_ASSESSMENT.Controller
                     hr.PutRoom(room);
                     return NoContent();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
 
                     return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the hotel.");
@@ -72,7 +73,7 @@ namespace BIGBANG_ASSESSMENT.Controller
                 {
                     return Ok(hr.PostRoom(room));
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
 
                     return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while creating the hotel.");
@@ -89,7 +90,7 @@ namespace BIGBANG_ASSESSMENT.Controller
                     hr.DeleteRoom(id);
                     return NoContent();
                 }
-                catch (Exception ex)
+                catch (Exception )
                 {
 
                     return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while deleting the hotel.");

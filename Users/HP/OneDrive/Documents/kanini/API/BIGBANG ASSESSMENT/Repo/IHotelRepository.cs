@@ -25,5 +25,7 @@ namespace BIGBANG_ASSESSMENT.Repo
 
         IEnumerable<Hotels> GetPrice(int price);
 
+        IEnumerable<Hotels> FilterHotels(string location, int price, string amenities);
+
     }
 }

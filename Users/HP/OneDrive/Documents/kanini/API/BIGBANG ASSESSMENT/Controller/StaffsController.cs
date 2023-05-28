@@ -7,11 +7,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BIGBANG_ASSESSMENT.DB;
 using BIGBANG_ASSESSMENT.Models;
+using System.Text;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace BIGBANG_ASSESSMENT.Controller
 {
-    [Authorize]
+    [Authorize(Roles = "Staff")]
     [Route("api/[controller]")]
     [ApiController]
     public class StaffsController : ControllerBase
@@ -23,25 +26,29 @@ namespace BIGBANG_ASSESSMENT.Controller
             _context = context;
         }
 
-        // GET: api/Staffs
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Staff>>> GetStaff()
         {
-          if (_context.Staff == null)
-          {
-              return NotFound();
-          }
-            return await _context.Staff.ToListAsync();
+            var staff = await _context.Staff.ToListAsync();
+            var GetStaff = staff
+                .Select(s => new Staff
+            {
+                StaffId = s.StaffId,
+                StaffName = s.StaffName,
+                StaffPassword = HashPassword(s.StaffPassword)
+            }).ToList();
+            return GetStaff;
         }
 
         // GET: api/Staffs/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Staff>> GetStaff(int id)
+        public async Task<ActionResult<Staff>> GetStaffById(int id)
         {
-          if (_context.Staff == null)
-          {
-              return NotFound();
-          }
+            if (_context.Staff == null)
+            {
+                return NotFound();
+            }
+
             var staff = await _context.Staff.FindAsync(id);
 
             if (staff == null)
@@ -49,7 +56,14 @@ namespace BIGBANG_ASSESSMENT.Controller
                 return NotFound();
             }
 
-            return staff;
+            var getStaff = new Staff
+            {
+                StaffId = staff.StaffId,
+                StaffName = staff.StaffName,
+                StaffPassword = HashPassword(staff.StaffPassword),
+            };
+
+            return getStaff;
         }
 
         // PUT: api/Staffs/5
@@ -117,7 +131,15 @@ namespace BIGBANG_ASSESSMENT.Controller
 
             return NoContent();
         }
-
+        private string HashPassword(string StaffPassword)
+        {
+          
+            using (var sha256 = SHA256.Create())
+            {
+                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(StaffPassword));
+                return Convert.ToBase64String(hashedBytes);
+            }
+        }
         private bool StaffExists(int id)
         {
             return (_context.Staff?.Any(e => e.StaffId == id)).GetValueOrDefault();

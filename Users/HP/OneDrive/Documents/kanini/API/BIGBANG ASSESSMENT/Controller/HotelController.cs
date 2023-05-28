@@ -3,10 +3,11 @@ using BIGBANG_ASSESSMENT.Repo;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BIGBANG_ASSESSMENT.Controller
 {
-    [Authorize]
+    [Authorize(Roles = "Customer,Staff")]
     [Route("api/[controller]")]
     [ApiController]
     public class HotelController : ControllerBase
@@ -27,7 +28,7 @@ namespace BIGBANG_ASSESSMENT.Controller
             {
                 return Ok(er.GetHotels());
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while retrieving hotels.");
             }
@@ -45,7 +46,7 @@ namespace BIGBANG_ASSESSMENT.Controller
                 }
                 return Ok(hotel);
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while retrieving the hotel.");
             }
@@ -75,7 +76,7 @@ namespace BIGBANG_ASSESSMENT.Controller
                 er.PutHotel(hotel);
                 return NoContent();
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the hotel.");
             }
@@ -90,7 +91,7 @@ namespace BIGBANG_ASSESSMENT.Controller
                 er.DeleteHotels(id);
                 return NoContent();
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while deleting the hotel.");
             }
@@ -104,7 +105,7 @@ namespace BIGBANG_ASSESSMENT.Controller
                 int availablerooms = er.GetAvailableRoomCount(hotelname);
                 return Ok(availablerooms);
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while retrieving the room availability count.");
             }
@@ -151,6 +152,20 @@ namespace BIGBANG_ASSESSMENT.Controller
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while filtering by price.");
+            }
+        }
+
+        [HttpGet("/filter/all three")]
+        public ActionResult<IEnumerable<Hotels>> Filter(string location, int price, string amenities)
+        {
+            try
+            {
+                var filteredHotels = er.FilterHotels(location, price, amenities);
+                return Ok(filteredHotels);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while filtering hotels.");
             }
         }
 
